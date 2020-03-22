@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TelloLib;
+using UnityEngine.UI;
 
 namespace UnityControllerForTello
 {
@@ -29,6 +30,9 @@ namespace UnityControllerForTello
 
         TelloAutoPilot autoPilot;
         public InputController inputController { get; private set; }
+
+        private GameObject batteryLevel;
+        private int previousBatteryPercent;
 
         private void Pause()
         {
@@ -88,6 +92,8 @@ namespace UnityControllerForTello
             {
                 //  telloManager.CustomStart();
                 telloManager.ConnectToTello();
+                batteryLevel = GameObject.Find("BatteryLevel"); // Get the battery object.
+                previousBatteryPercent = telloManager.batteryPercent; // Set this now. The UI will only update when this changes. 
             }
             if (sceneType != SceneType.FlyOnly)
                 simulator.CustomStart(this);
@@ -106,6 +112,12 @@ namespace UnityControllerForTello
             {
 
                 telloManager.CheckForUpdate();
+
+                if(telloManager.batteryPercent != previousBatteryPercent)
+                {
+                    batteryLevel.GetComponent<Text>().text = $"BATTERY:  {telloManager.batteryPercent}%";
+                    previousBatteryPercent = telloManager.batteryPercent;
+                }
             }
         }
 
